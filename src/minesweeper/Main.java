@@ -10,8 +10,10 @@ import javax.swing.*;
 public class Main{
     final static int EASY = 0, MEDIUM = 1, HARD = 2;
 	public static void main(String[] args) {
-		
+		newGame();
 	}
+	
+	static int diff = HARD;
 	
 	public static void newGame() {
 		JFrame options = new JFrame();
@@ -32,13 +34,18 @@ public class Main{
 		panel.add(h);
 		JButton play = new JButton("Play");
 		play.setBounds(5, 75, 15, 10);
-		int difficulty;
 		play.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (easy.isSelected()) {
-					difficulty = EASY;
+					setDiff(EASY);
+				} else if (m.isSelected()) {
+					setDiff(MEDIUM);
+				} else if (h.isSelected()) {
+					setDiff(HARD);
 				}
+				board brd = new board(diff);
+				options.setVisible(false);
 			}
 		});
 		panel.add(play);
@@ -46,6 +53,9 @@ public class Main{
 		options.setVisible(true);
 	}
 	
+	static private void setDiff(int difficulty) {
+		diff = difficulty;
+	}
 	
 //	//iterate through this 8 times and add it to x and y positions to get circle around point
 //	static final int[] cX = {0,1,1,1,0,-1,-1,-1};

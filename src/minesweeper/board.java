@@ -107,4 +107,8 @@ public class board extends JFrame
 	private void endgame() {
 		this.gState = ENDGAME;
 	}
+	
+	void update(int[][] previous) {
+		
+	}
 }
