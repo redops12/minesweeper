@@ -11,7 +11,9 @@ public class board extends JFrame
     final int PREGAME = 0, INGAME = 1, ENDGAME = 2;
     final int EASY = 0, MEDIUM = 1, HARD = 2;
     private int[][] brd;
+    private int[][] prevBrd;
     int gState = PREGAME;
+    Canvas canvas;
     board(int diff) {
         int width;
         int height;
@@ -35,15 +37,20 @@ public class board extends JFrame
         }    
         int[][] tbrd = new int[height][width];
         brd = tbrd;
+        copyToPrev(brd);
         this.setTitle("Minesweeper");
         this.setSize(width*41+1,height*41+1);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
         this.setResizable(false);
+        Image image = new Image();
+        this.setContentPane(image);
+        this.setVisible(true);
     }
-    
-    public void endGame(){
-        gState = ENDGAME;
+    //https://www.youtube.com/watch?v=EMu1cC2Vnis
+    public class Image extends JPanel {
+    	public void paintComponent(Graphics g) {
+    		
+    	}
     }
     
     private void placeMines(int diff, int startX, int startY){
@@ -108,7 +115,23 @@ public class board extends JFrame
 		this.gState = ENDGAME;
 	}
 	
-	void update(int[][] previous) {
+	private void midgame() {
+		this.gState = INGAME;
+	}
+	
+	void copyToPrev(int[][] board) {
+		for (int i = 0; i < board.length; i++) {
+			for (int j = 0; j < board[0].length; j++) {
+				this.prevBrd[i][j] = board[i][j];
+			}
+		}
+	}
+	
+	void update() {
+		switch(gState) {
+		case PREGAME:
+		this.
+			
 		
 	}
 }
