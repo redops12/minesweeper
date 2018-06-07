@@ -9,7 +9,7 @@ import javax.swing.*;
 
 public class Main{
     final static int EASY = 0, MEDIUM = 1, HARD = 2;
-	public static void main(String[] args) {
+	public static void main(String args[]) {
 		newGame();
 	}
 	

@@ -69,7 +69,7 @@ public class board extends JFrame
         this.brd = tbrd;
         this.prevBrd = pbrd;
         this.setTitle("Minesweeper");
-        this.setSize(width*32+32,height*32+32);
+        this.setSize(width*32,height*32+22);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
         BoardVisual visual = new BoardVisual(width, height);
@@ -89,7 +89,7 @@ public class board extends JFrame
     	}
     	
     	public void paintComponent(Graphics g) {
-    		System.out.println(gState);
+    		//System.out.println(gState);
     		if (gState == ENDGAME) {
 	    		for (int i = 0; i < brd.length; i++) {
     				for (int j = 0; j < brd[0].length; j++) {
@@ -103,6 +103,8 @@ public class board extends JFrame
     	    			case -1:
     	    				g.drawImage(bomb, j*32, i*32, null);
     	    				break;
+    	    			case 0:
+    	    				g.drawImage(clicked, j*32, i*32, null);
     	    			case 1:
     	    				g.drawImage(one, j*32, i*32, null);
     	    				break;
@@ -131,7 +133,7 @@ public class board extends JFrame
 	    			}
 	    		}
     		} else if(gState == INGAME) {
-    			System.out.println(changes.toString());
+    			//System.out.println(changes.toString());
     			for (int i = 0; i < brd.length; i++) {
     				for (int j = 0; j < brd[0].length; j++) {
     					switch(brd[i][j]) {
@@ -174,6 +176,48 @@ public class board extends JFrame
 			    			}
     					}
     				}
+//    			while(changes.size() > 1) {
+//					switch(brd[changes.get(0)][changes.get(1)]) {
+//		    			case -4:
+//		    				g.drawImage(flag, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case -2:
+//		    				g.drawImage(unclicked, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case -1:
+//		    				g.drawImage(unclicked, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 0:
+//		    				g.drawImage(clicked, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 1:
+//		    				g.drawImage(one, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 2:
+//		    				g.drawImage(two, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 3:
+//		    				g.drawImage(three, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 4:
+//		    				g.drawImage(four, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 5:
+//		    				g.drawImage(five, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 6:
+//		    				g.drawImage(six, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 7:
+//		    				g.drawImage(seven, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			case 8:
+//		    				g.drawImage(eight, changes.get(0)*32, changes.get(1)*32, null);
+//		    				break;
+//		    			}
+//					changes.remove(0);
+//					changes.remove(0);
+//    				}
     			}
     		 else {
     			g.setColor(Color.black);
@@ -213,8 +257,16 @@ public class board extends JFrame
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			System.out.println("clicked");
-			clicked((int)Math.floor(e.getY()/32.0),(int)Math.floor(e.getX()/32.0));
+			//System.out.println("clicked");
+			System.out.println(e.getY() + "," + e.getX());
+			int gX = (int)Math.floor(e.getX()/32.0);
+			int gY = (int)Math.floor((e.getY()-22)/32.0);
+			if(e.getButton() == MouseEvent.BUTTON1) {
+				clicked(gY,gX);
+			} else if(e.getButton() == MouseEvent.BUTTON2) {
+				brd[gY][gX] = -3;
+			}
+			trackChanges();
 		}
 
 		@Override
@@ -258,7 +310,7 @@ public class board extends JFrame
             int x = (int)(Math.random()*brd[0].length);
             int disX = Math.abs(startX-x);
             int disY = Math.abs(startY-y);
-            if (bombs[y][x] != -1 && !(disX < 1 && disY < 1)) {
+            if (bombs[y][x] != -1 && !(disX < 2 && disY < 2)) {
                 bombs[y][x] = -1;
             	brd[y][x] = -1;
             }
@@ -284,7 +336,7 @@ public class board extends JFrame
 	}
 	
 	private void clicked(int y, int x) {
-		System.out.println("click");
+		//System.out.println("click");
 		if (gState == PREGAME) {
 			midgame();
 			placeMines(x, y);
@@ -303,9 +355,8 @@ public class board extends JFrame
 				}					
 			}
 		}
-		trackChanges();
 		paintComponents(getGraphics());
-		printArray(brd);
+		//printArray(brd);
 	}
 	
 	private void endgame() {
@@ -328,9 +379,9 @@ public class board extends JFrame
 		for (int i = 0; i < brd.length; i++) {
 			for (int j = 0; j < brd[0].length; j++) {
 				if(brd[i][j] != prevBrd[i][j]) {
-					changes.add(i);
 					changes.add(j);
-					System.out.println("add" + i + j);
+					changes.add(i);
+					//System.out.println("add" + i + j);
 				}
 			}
 		}
