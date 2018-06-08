@@ -71,7 +71,7 @@ public class board extends JFrame
         this.prevBrd = pbrd;
         this.setTitle("Minesweeper");
         this.setSize(width*32,height*32+22);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         this.setResizable(false);
         BoardVisual visual = new BoardVisual(width, height);
         this.setContentPane(visual);
@@ -79,7 +79,7 @@ public class board extends JFrame
         this.addMouseMotionListener(new mouse(visual));
         this.setVisible(true);
     }
-    
+        
     //https://www.youtube.com/watch?v=EMu1cC2Vnis
     public class BoardVisual extends JPanel {
     	int width;
@@ -271,13 +271,13 @@ public class board extends JFrame
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			if (gState != ENDGAME) {
-				System.out.println(e.getY() + "," + e.getX());
+				//System.out.println(e.getY() + "," + e.getX());
 				int gX = (int)Math.floor(e.getX()/32.0);
 				int gY = (int)Math.floor((e.getY()-22)/32.0);
 				if(e.getButton() == MouseEvent.BUTTON1) {
 					clicked(gY,gX);
 				} else {
-					System.out.println("clicked");
+					//System.out.println("clicked");
 					rClicked(gY,gX);
 				}
 				trackChanges();
@@ -356,7 +356,11 @@ public class board extends JFrame
 	}
 	
 	private void rClicked(int y, int x) {
-		brd[y][x] = -4;
+		if (brd[y][x] < 0 && brd[y][x] != -4) {
+			brd[y][x] = -4;
+		} else if(brd[y][x] == -4) {
+			brd[y][x] = bombs[y][x];
+		}
 	}
 	
 	private void clicked(int y, int x) {
@@ -384,8 +388,8 @@ public class board extends JFrame
 	
 	private void endgame() {
 		this.gState = ENDGAME;
-		notifyAll();
-//		JFrame replay = new JFrame();
+		Main.main(null);
+		//		JFrame replay = new JFrame();
 	}
 	
 	private int getNumClicked() {
