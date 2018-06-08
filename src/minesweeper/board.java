@@ -23,6 +23,7 @@ public class board extends JFrame
     private int[][] prevBrd;
     int gState = PREGAME;
     int diff = HARD;
+    int numTilesForWin;
     Image unclicked;
     Image one;
     Image two;
@@ -74,8 +75,8 @@ public class board extends JFrame
         this.setResizable(false);
         BoardVisual visual = new BoardVisual(width, height);
         this.setContentPane(visual);
-        this.addMouseListener(new mouse());
-        this.addMouseMotionListener(new mouse());
+        this.addMouseListener(new mouse(visual));
+        this.addMouseMotionListener(new mouse(visual));
         this.setVisible(true);
     }
     
@@ -94,6 +95,13 @@ public class board extends JFrame
 	    		for (int i = 0; i < brd.length; i++) {
     				for (int j = 0; j < brd[0].length; j++) {
     					switch(brd[i][j]) {
+    					case -4:
+    						if (bombs[i][j] == -1) {
+        	    				g.drawImage(flag, j*32, i*32, null);
+    						} else {
+        	    				g.drawImage(wrongFlag, j*32, i*32, null);
+    						}
+    						break;
     					case -3:
     	    				g.drawImage(clickedBomb, j*32, i*32, null);
     	    				break;
@@ -105,6 +113,7 @@ public class board extends JFrame
     	    				break;
     	    			case 0:
     	    				g.drawImage(clicked, j*32, i*32, null);
+    	    				break;
     	    			case 1:
     	    				g.drawImage(one, j*32, i*32, null);
     	    				break;
@@ -232,6 +241,10 @@ public class board extends JFrame
     }
     
     public class mouse implements MouseInputListener{
+    	BoardVisual bv;
+    	mouse(BoardVisual bv){
+    		this.bv = bv;
+    	}
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			
@@ -257,16 +270,22 @@ public class board extends JFrame
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
-			//System.out.println("clicked");
-			System.out.println(e.getY() + "," + e.getX());
-			int gX = (int)Math.floor(e.getX()/32.0);
-			int gY = (int)Math.floor((e.getY()-22)/32.0);
-			if(e.getButton() == MouseEvent.BUTTON1) {
-				clicked(gY,gX);
-			} else if(e.getButton() == MouseEvent.BUTTON2) {
-				brd[gY][gX] = -3;
+			if (gState != ENDGAME) {
+				System.out.println(e.getY() + "," + e.getX());
+				int gX = (int)Math.floor(e.getX()/32.0);
+				int gY = (int)Math.floor((e.getY()-22)/32.0);
+				if(e.getButton() == MouseEvent.BUTTON1) {
+					clicked(gY,gX);
+				} else {
+					System.out.println("clicked");
+					rClicked(gY,gX);
+				}
+				trackChanges();
+				bv.repaint();
+				if (getNumClicked() == numTilesForWin) {
+					endgame();
+				}
 			}
-			trackChanges();
 		}
 
 		@Override
@@ -298,6 +317,7 @@ public class board extends JFrame
                 num = 99;
                 break;
         }
+        numTilesForWin = (brd.length*brd[0].length) - num;
         
         for (int i = 0; i < brd.length; i++) {
 			for (int j = 0; j < brd[0].length; j++) {
@@ -324,7 +344,7 @@ public class board extends JFrame
 	private int check(int y, int x) {
 		int num = 0;
 		for (int i = 0; i < 8; i++) {
-			if (this.inBounds(y+cY[i],x+cX[i]) && brd[y+cY[i]][x+cX[i]] == -1) {
+			if (this.inBounds(y+cY[i],x+cX[i]) && bombs[y+cY[i]][x+cX[i]] == -1) {
 				num++;
 			}
 		}
@@ -335,6 +355,10 @@ public class board extends JFrame
 		return (y<brd.length && y > -1 && x < brd[0].length && x > -1);
 	}
 	
+	private void rClicked(int y, int x) {
+		brd[y][x] = -4;
+	}
+	
 	private void clicked(int y, int x) {
 		//System.out.println("click");
 		if (gState == PREGAME) {
@@ -342,7 +366,7 @@ public class board extends JFrame
 			placeMines(x, y);
 		}
 		copyToPrev(brd);
-		if (brd[y][x] == -1) {
+		if (bombs[y][x] == -1) {
 			this.endgame();
 			brd[y][x] = -3;
 		} else {
@@ -355,12 +379,25 @@ public class board extends JFrame
 				}					
 			}
 		}
-		paintComponents(getGraphics());
 		//printArray(brd);
 	}
 	
 	private void endgame() {
 		this.gState = ENDGAME;
+		notifyAll();
+//		JFrame replay = new JFrame();
+	}
+	
+	private int getNumClicked() {
+		int numClicked = 0;
+		for (int i = 0; i < brd.length; i++) {
+			for (int j = 0; j < brd[0].length; j++) {
+				if (brd[i][j] >= 0) {
+					numClicked++;
+				}
+			}
+		}
+		return numClicked;
 	}
 	
 	private void midgame() {

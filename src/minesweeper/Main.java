@@ -46,6 +46,11 @@ public class Main{
 				}
 				board brd = new board(diff);
 				options.setVisible(false);
+				try {
+					wait();
+				} catch (InterruptedException f) {
+					options.setVisible(true);
+				}
 			}
 		});
 		panel.add(play);
